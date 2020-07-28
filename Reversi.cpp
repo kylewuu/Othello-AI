@@ -4,9 +4,9 @@ using namespace std;
 
 Reversi::Reversi(void)
 {
-    print_intro();
-    init_boards();
-    print_boards();
+    // print_intro();
+    // init_boards();
+    // print_boards();
 
     main_loop();
 };
@@ -22,13 +22,11 @@ void Reversi::print_intro()
 
 void Reversi::init_boards()
 {
-    player_board = new int[64];
-    map_board = new int[64];
+    board = new int[64];
 
     for (int i = 0; i < 64; i++)
     {
-        player_board[i] = 0;
-        map_board[i] = 0;
+        board[i] = 0;
     }
 }
 
@@ -42,7 +40,7 @@ void Reversi::print_boards()
         for (int j = 0; j < 8; j++)
         {
 
-            cout << (player_board[(i * 8) + j] == 0 ? " " : (player_board[(i * 8) + j] == 1 ? "x" : "O")) << ((j == 7) ? " " : " | ");
+            cout << (board[(i * 8) + j] == 0 ? " " : (board[(i * 8) + j] == 1 ? "x" : "O")) << ((j == 7) ? " " : " | ");
         }
         cout << "          ";
 
@@ -50,7 +48,7 @@ void Reversi::print_boards()
         for (int j = 0; j < 8; j++)
         {
 
-            cout << (player_board[(i * 8) + j] == 0 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " ") : "    ") << ((j == 7) ? " " : " | ");
+            cout << (board[(i * 8) + j] == 0 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " ") : "    ") << ((j == 7) ? " " : " | ");
         }
 
         // player board
@@ -67,6 +65,72 @@ void Reversi::print_boards()
     cout << "\n";
 }
 
+bool Reversi::is_int(string str)
+{
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (!isdigit(str[i]))
+            return false;
+    }
+    return true;
+}
+
+bool Reversi::is_valid_space(string str)
+{
+    if (!is_int(str))
+        return false;
+
+    int int_input = stoi(str);
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (i == int_input && board[i] == 0)
+        {
+
+            return true;
+        }
+    }
+    return false;
+}
+
+void Reversi::make_move(string str)
+{
+    int int_input = stoi(str);
+
+    board[int_input] = turn;
+    if (turn == 1)
+        turn = 2;
+    else
+        turn = 1;
+}
+
+void Reversi::read_input()
+{
+    bool is_int_flag = false;
+    bool is_valid_space_flag = false;
+    cout << "Make a move: ";
+    cin >> input;
+    is_valid_space_flag = is_valid_space(input);
+
+    while (!is_valid_space_flag)
+    {
+        cout << "Make a valid move: ";
+        cin >> input;
+        is_valid_space_flag = is_valid_space(input);
+    }
+    cout << "\n";
+    make_move(input);
+}
+
 void Reversi::main_loop()
 {
+    print_intro();
+    init_boards();
+    turn = 1;
+
+    while (true)
+    {
+        read_input();
+        print_boards();
+    }
 }
