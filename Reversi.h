@@ -7,7 +7,8 @@ class Reversi
 {
     int a;
     int turn;
-    int *board; // 0 = blank, 1 = player 1, 2 = player 2
+    int *board; // 0 = blank, 1 = player 1, 2 = player 2. 1=x=black 2=o=white
+    int *legal_moves; // 0 = not legal, 1 = legal
     string input;
 
 public:
@@ -19,7 +20,11 @@ public:
     void print_boards(void);
 
     bool is_int(string);
-    bool is_valid_space(string);
+    bool is_legal_move(string);
+    void clear_legal_moves(void);
+    void find_legal_moves(void);
     void make_move(string);
     void read_input(void);
+    bool check_for_end(void);
+    int check_winner(void);
 };
