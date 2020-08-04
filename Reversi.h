@@ -9,6 +9,8 @@ class Reversi
     int turn;
     int *board; // 0 = blank, 1 = player 1, 2 = player 2. 1=x=black 2=o=white
     int *legal_moves; // 0 = not legal, 1 = legal
+    int player;
+    int ai;
     string input;
 
 public:
@@ -27,4 +29,6 @@ public:
     void read_input(void);
     bool check_for_end(void);
     int check_winner(void);
+
+    void temp_make_random_move(void);
 };
