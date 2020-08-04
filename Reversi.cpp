@@ -1,4 +1,5 @@
 #include "Reversi.h"
+#include "Mct.h"
 #include <cstdlib>
 #include <ctime>
 
@@ -18,8 +19,10 @@ void Reversi::print_intro()
          << "x                         x\n"
          << "xxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n " << endl;
 
-    if(player == 1) cout << "You are \033[31mx\033[0m, you are going first\n\n";
-    else if (player == 2) cout << "You are \033[36mO\033[0m, you are going second\n\n";
+    if (player == 1)
+        cout << "You are \033[31mx\033[0m, you are going first\n\n";
+    else if (player == 2)
+        cout << "You are \033[36mO\033[0m, you are going second\n\n";
 }
 
 void Reversi::init_boards()
@@ -34,14 +37,14 @@ void Reversi::init_boards()
 
     board[35] = 1;
     board[28] = 1;
-    
+
     board[27] = 2;
     board[36] = 2;
 }
 
 void Reversi::clear_legal_moves()
 {
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
         legal_moves[i] = 0;
     }
@@ -57,7 +60,7 @@ void Reversi::print_boards()
         for (int j = 0; j < 8; j++)
         {
 
-            cout << "\033[33m" <<  (board[(i * 8) + j] == 0 ? (legal_moves[(i * 8) + j] == 1 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " \033[0m") : "    \033[0m") : (board[(i * 8) + j] == 1 ? " \033[31mx\033[0m  " : " \033[36mO\033[0m  ")) << ((j == 7) ? " " : " | ");
+            cout << "\033[33m" << (board[(i * 8) + j] == 0 ? (legal_moves[(i * 8) + j] == 1 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " \033[0m") : "    \033[0m") : (board[(i * 8) + j] == 1 ? " \033[31mx\033[0m  " : " \033[36mO\033[0m  ")) << ((j == 7) ? " " : " | ");
         }
         cout << "          ";
 
@@ -116,155 +119,160 @@ void Reversi::find_legal_moves()
     int temp;
     bool piece_between;
 
-    if(turn == 1) opponent = 2;
-    else opponent = 1;
+    if (turn == 1)
+        opponent = 2;
+    else
+        opponent = 1;
 
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
         // cout << board[i];
-        if(board[i] == turn)
+        if (board[i] == turn)
         {
             // top left
-            temp = i-9;
+            temp = i - 9;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp -= 9;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp+1)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp + 1) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // top
-            temp = i-8;
+            temp = i - 8;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp -= 8;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // top right
-            temp = i-7;
+            temp = i - 7;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp -= 7;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // right
-            temp = i+1;
+            temp = i + 1;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp += 1;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // bottom right
-            temp = i+9;
+            temp = i + 9;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp += 9;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // bottom
-            temp = i+8;
+            temp = i + 8;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp += 8;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // bottom left
-            temp = i+7;
+            temp = i + 7;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp += 7;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp+1)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp + 1) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
 
             // left
-            temp = i-1;
+            temp = i - 1;
             piece_between = false;
-            while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+            while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
             {
                 piece_between = true;
                 temp -= 1;
             }
-            if(temp < 64 && temp >= 0 && board[temp] == 0 && (temp+1)%8!=0 && piece_between) legal_moves[temp] = 1;
+            if (temp < 64 && temp >= 0 && board[temp] == 0 && (temp + 1) % 8 != 0 && piece_between)
+                legal_moves[temp] = 1;
         }
-        
     }
-
-    
 }
 
 bool Reversi::check_for_end()
 {
 
-
     bool legal_moves_flag = false;
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
-        if(legal_moves[i] == 1)
+        if (legal_moves[i] == 1)
         {
             legal_moves_flag = true;
             return false;
         }
     }
 
-    if(!legal_moves_flag)
+    if (!legal_moves_flag)
     {
-        if(turn == 1)
+        if (turn == 1)
         {
-            
+
             turn = 2;
             find_legal_moves();
-            for(int i=0;i<64;i++)
+            for (int i = 0; i < 64; i++)
             {
-                if(legal_moves[i] == 1) 
+                if (legal_moves[i] == 1)
                 {
-                    cout << "\033[31mx\033[0m has no moves, \033[36mO\033[0m is going now.";
+                    cout << "\033[31mx\033[0m has no moves, \033[36mO\033[0m is going now.\n";
                     return false;
                 }
             }
         }
         else
         {
-            
+
             turn = 1;
             find_legal_moves();
-            for(int i=0;i<64;i++)
+            for (int i = 0; i < 64; i++)
             {
-                if(legal_moves[i] == 1) 
+                if (legal_moves[i] == 1)
                 {
-                    cout << "\033[36mO\033[0m has no moves, \033[31mx\033[0m is going now.";
+                    cout << "\033[36mO\033[0m has no moves, \033[31mx\033[0m is going now.\n";
                     return false;
                 }
             }
         }
-        
     }
 
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
-        if(board[i] == 0)
+        if (board[i] == 0)
         {
             cout << "No players can make anymore valid moves\n";
         }
     }
-    
+
     return true;
 }
 
@@ -273,47 +281,51 @@ int Reversi::check_winner()
     int x = 0;
     int o = 0;
 
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
-        if(board[i] == 1) x += 1;
-        else if(board[i] == 2) o += 1;
+        if (board[i] == 1)
+            x += 1;
+        else if (board[i] == 2)
+            o += 1;
     }
 
     cout << "\nx: " << x;
     cout << "\nO: " << o;
-    if(x > o) return 1;
-    else if(o > x) return 2;
+    if (x > o)
+        return 1;
+    else if (o > x)
+        return 2;
     return 0;
 }
 
-void Reversi::make_move(string str) // need to add the flipping 
+void Reversi::make_move(string str) // need to add the flipping
 {
     int int_input = stoi(str);
-
-    
 
     int opponent;
     int temp;
     bool piece_between;
 
-    if(turn == 1) opponent = 2;
-    else opponent = 1;
+    if (turn == 1)
+        opponent = 2;
+    else
+        opponent = 1;
 
     int i = int_input;
 
     // top left
-    temp = i-9;
+    temp = i - 9;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp -= 9;
     }
-    if(board[temp] == turn && (temp+1)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
     {
 
-        temp = i-9;
-        while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+        temp = i - 9;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp -= 9;
@@ -321,19 +333,18 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // top
-    temp = i-8;
+    temp = i - 8;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp -= 8;
-
     }
-    if(board[temp] == turn && piece_between) 
+    if (board[temp] == turn && piece_between)
     {
 
-        temp = i-8;
-        while(temp < 64 && temp >= 0 && board[temp] == opponent)
+        temp = i - 8;
+        while (temp < 64 && temp >= 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp -= 8;
@@ -341,17 +352,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // top right
-    temp = i-7;
+    temp = i - 7;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp -= 7;
     }
-    if(board[temp] == turn && (temp)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
     {
-        temp = i-7;
-        while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+        temp = i - 7;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp -= 7;
@@ -359,17 +370,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // right
-    temp = i+1;
+    temp = i + 1;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp += 1;
     }
-    if(board[temp] == turn && (temp)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
     {
-        temp = i+1;
-        while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+        temp = i + 1;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp += 1;
@@ -377,17 +388,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // bottom right
-    temp = i+9;
+    temp = i + 9;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp += 9;
     }
-    if(board[temp] == turn && (temp)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
     {
-        temp = i+9;
-        while(temp < 64 && temp >= 0 && (temp)%8!=0 && board[temp] == opponent)
+        temp = i + 9;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp += 9;
@@ -395,17 +406,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // bottom
-    temp = i+8;
+    temp = i + 8;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp += 8;
     }
-    if(board[temp] == turn && piece_between) 
+    if (board[temp] == turn && piece_between)
     {
-        temp = i+8;
-        while(temp < 64 && temp >= 0 && board[temp] == opponent)
+        temp = i + 8;
+        while (temp < 64 && temp >= 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp += 8;
@@ -413,17 +424,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // bottom left
-    temp = i+7;
+    temp = i + 7;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp += 7;
     }
-    if(board[temp] == turn && (temp+1)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
     {
-        temp = i+7;
-        while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+        temp = i + 7;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp += 7;
@@ -431,17 +442,17 @@ void Reversi::make_move(string str) // need to add the flipping
     };
 
     // left
-    temp = i-1;
+    temp = i - 1;
     piece_between = false;
-    while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
     {
         piece_between = true;
         temp -= 1;
     }
-    if(board[temp] == turn && (temp+1)%8!=0 && piece_between) 
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
     {
-        temp = i-1;
-        while(temp < 64 && temp >= 0 && (temp+1)%8!=0 && board[temp] == opponent)
+        temp = i - 1;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
         {
             board[temp] = turn;
             temp -= 1;
@@ -453,16 +464,16 @@ void Reversi::make_move(string str) // need to add the flipping
         turn = 2;
     else
         turn = 1;
-    
 }
 
 void Reversi::temp_make_random_move()
 {
 
-    int move = 0;
-    while(legal_moves[move] == 0)
+    int move = rand() % 64;
+    ;
+    while (legal_moves[move] == 0)
     {
-        move = rand()%63;
+        move = rand() % 64;
     }
 
     cout << "The AI chose: " << move << "\n";
@@ -473,19 +484,23 @@ void Reversi::temp_make_random_move()
 void Reversi::read_input()
 {
     // if player's turn
-    if(turn == player)
+    if (turn == player)
     {
         bool is_int_flag = false;
         bool is_valid_space_flag = false;
-        if (turn == 2) cout << "o (blue): make a move: ";
-        else if (turn == 1) cout << "x (red): make a move: ";
+        if (turn == 2)
+            cout << "o (blue): make a move: ";
+        else if (turn == 1)
+            cout << "x (red): make a move: ";
         cin >> input;
         is_valid_space_flag = is_legal_move(input);
 
         while (!is_valid_space_flag)
         {
-            if (turn == 2) cout << "o (white): make a valid move: ";
-            else if (turn == 1) cout << "x (black): make a valid move: ";
+            if (turn == 2)
+                cout << "o (white): make a valid move: ";
+            else if (turn == 1)
+                cout << "x (black): make a valid move: ";
             cin >> input;
             is_valid_space_flag = is_legal_move(input);
         }
@@ -496,10 +511,11 @@ void Reversi::read_input()
     else
     {
         cout << "It is the AI's turn\n";
-        temp_make_random_move();
-
+        Mct ai{board, legal_moves, turn};
+        int ai_input = ai.playout();
+        make_move(std::to_string(ai_input));
+        // temp_make_random_move();
     }
-    
 }
 
 void Reversi::main_loop()
@@ -507,7 +523,7 @@ void Reversi::main_loop()
     turn = 1;
     srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
     // this was added because the same number was being generated on every run
-    player = rand()%2 + 1;
+    player = rand() % 2 + 1;
     // if(player == 1) ai = 2;
     // else ai = 1;
     print_intro();
@@ -515,7 +531,6 @@ void Reversi::main_loop()
     clear_legal_moves();
     find_legal_moves();
     print_boards();
-    
 
     while (!check_for_end())
     {
@@ -527,7 +542,10 @@ void Reversi::main_loop()
 
     cout << "Fini\n\n";
     int winner = check_winner();
-    if(winner == 1) cout << "\nx is the winner\n";
-    if(winner == 2) cout << "\nO is the winner\n";
-    if(winner == 0) cout << "\nThe match ended in a draw\n";
+    if (winner == 1)
+        cout << "\nx is the winner\n\n";
+    if (winner == 2)
+        cout << "\nO is the winner\n\n";
+    if (winner == 0)
+        cout << "\nThe match ended in a draw\n\n";
 }
