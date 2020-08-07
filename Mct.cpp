@@ -1,14 +1,16 @@
 #include "Mct.h"
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in)
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    playouts = 1000;
+    playouts = 8534 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
     initial_turn = turn_passed_in;
 
     // temp variables
@@ -437,20 +439,27 @@ int Mct::playout(void)
 
     int *scores = new int[64];
 
-    int loss = -55;
-    int win = 50;
+    int loss = -50;
+    int win = 55;
     int draw = 25;
+    int moves_count = 0;
+    int dynamic_playouts = 0;
 
     for (int i = 0; i < 64; i++)
     {
         scores[i] = 0;
+        if(initial_legal_moves[i] == 1) moves_count += 1;
     }
+
+    
 
     for (int i = 0; i < 64; i++)
     {
+        dynamic_playouts = playouts/moves_count;
         if (initial_legal_moves[i] == 1)
         {
-            for (int j = 0; j < playouts; j++)
+            auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
+            for (int j = 0; j < dynamic_playouts; j++)
             {
                 // resetting the board
 
@@ -460,11 +469,11 @@ int Mct::playout(void)
                     board[k] = initial_board[k];
                     legal_moves[k] = initial_legal_moves[k];
                 }
-                int count = 0;
+                // int count = 0;
                 while (!check_for_end())
                 {
                     // cout << "Making move ..." << count << "\n\n\n\n\n";
-                    count++;
+                    // count++;
                     make_move();
                     clear_legal_moves();
                     find_legal_moves();
@@ -479,6 +488,12 @@ int Mct::playout(void)
                 if (winner == 0)
                     scores[i] += draw;
             }
+
+            auto end = high_resolution_clock::now();
+            auto duration = duration_cast<milliseconds>(end-start);
+            long duration_seconds = duration.count();
+            cout << playouts << " playouts took " << duration_seconds << " milliseconds\n";
+
         }
     }
 
