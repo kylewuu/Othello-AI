@@ -606,13 +606,45 @@ void MctHeuristic::make_first_move(int move)
 int MctHeuristic::playout(void)
 {
 
-    int *scores = new int[64];
+    float *scores = new float[64];
 
     int loss = -50;
     int win = 55;
     int draw = 25;
     int moves_count = 0;
     int dynamic_playouts = 0;
+    float early_move_multiplier[64] = {
+        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5,
+        0.75,0.75,1.25,1.25,1.25,1.25,0.75,0.75,
+        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
+        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
+        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
+        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
+        0.75,0.75,1.25,1.25,1.25,1.25,0.75,0.75,
+        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5
+    };
+
+    float mid_move_multiplier[64] = {
+        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5,
+        0.75,0.75,1,1,1,1,0.75,0.75,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        0.75,0.75,1,1,1,1,0.75,0.75,
+        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5
+    };
+
+    float late_move_multiplier[64] = {
+        1.5,1,1.25,1.25,1.25,1.25,1,1.5,
+        1,0.75,1,1,1,1,1,1,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        1.25,1,1,1,1,1,1,1.25,
+        1,1,1,1,1,1,1,1,
+        1.5,1,1.25,1.25,1.25,1.25,1,1.5
+    };
 
     for (int i = 0; i < 64; i++)
     {
@@ -631,7 +663,6 @@ int MctHeuristic::playout(void)
             for (int j = 0; j < dynamic_playouts; j++)
             {
                 // resetting the board
-
                 turn = initial_turn;
                 for (int k = 0; k < 64; k++)
                 {
@@ -640,14 +671,20 @@ int MctHeuristic::playout(void)
                 }
                 // int count = 0;
                 make_first_move(i);
+
+                // heuristics for checking how many moves the opponent now has
+                for(int k=0;k<64;k++)
+                {
+                    if(legal_moves[k] == 1) scores[i] -= 3/dynamic_playouts;
+                }
+
                 while (!check_for_end())
                 {
-                    // cout << "Making move ..." << count << "\n\n\n\n\n";
-                    // count++;
+
                     make_move();
                     clear_legal_moves();
                     find_legal_moves();
-                    // print_boards();
+
                 }
 
                 int winner = check_winner();
@@ -659,6 +696,18 @@ int MctHeuristic::playout(void)
                     scores[i] += draw;
             }
 
+            // more heuristics to different spots in the board
+            int pieces_count = 0;
+            for(int k=0;k<64;k++)
+            {
+                if(initial_board[k] != 0) pieces_count ++;
+            }
+
+            if(pieces_count <= 20) scores[i] *= early_move_multiplier[i];
+            else if(pieces_count <= 35) scores[i] *= mid_move_multiplier[i];
+            else if(pieces_count <= 64) scores[i] *= late_move_multiplier[i];
+            
+
             auto end = high_resolution_clock::now();
             auto duration = duration_cast<milliseconds>(end-start);
             long duration_seconds = duration.count();
@@ -667,8 +716,16 @@ int MctHeuristic::playout(void)
         }
     }
 
-    int max = (playouts * loss) - 1;
+    int max = (playouts * loss) - 1 - 5;
     int input = 0;
+    for(int i=0;i<64;i++)
+    {
+        if(initial_legal_moves[i] == 1)
+        {
+            max = scores[i];
+            input = i;
+        }
+    }
     for (int i = 0; i < 64; i++)
     {
         // if (i % 8 == 0)

@@ -279,13 +279,8 @@ bool Reversi::check_for_end()
         }
     }
 
-    for (int i = 0; i < 64; i++)
-    {
-        if (board[i] == 0)
-        {
-            cout << "No players can make anymore valid moves\n";
-        }
-    }
+
+    cout << "No players can make anymore valid moves\n";
 
     return true;
 }
@@ -545,96 +540,107 @@ void Reversi::read_input()
 
 void Reversi::main_loop()
 {
-    string ai_vs_ai_string;
-    while(ai_vs_ai_string != "yes" && ai_vs_ai_string != "no" &&ai_vs_ai_string != "y" && ai_vs_ai_string != "n" && ai_vs_ai_string != "test")
+    string play_again = "yes";
+    while(play_again != "no" && play_again != "n")
     {
-        cout << "Would you like to just watch two AI play against each other? (yes/no)";
-        cin >> ai_vs_ai_string;
-    }
-    
-    if(ai_vs_ai_string == "yes" || ai_vs_ai_string == "y")
-    {
-        cout << "The match will now begin between heuristic AI and pure Monte-Carlo Tree Search";
-        ai_vs_ai = true;
-    }
-    else if (ai_vs_ai_string == "no" || ai_vs_ai_string == "n")
-    {
-        cout << "The match will now begin between you and pure Monte-Carlo Tree Search";
-        ai_vs_ai = false;
-    }
-    else if(ai_vs_ai_string == "test")
-    {
-        ai_vs_ai = true;
-        int mct_count = 0;
-        int heuristic_count = 0;
-        for(int j=0;j<100;j++)
+        string ai_vs_ai_string;
+        while(ai_vs_ai_string != "yes" && ai_vs_ai_string != "no" &&ai_vs_ai_string != "y" && ai_vs_ai_string != "n" && ai_vs_ai_string != "test")
         {
-            turn = 1;
+            cout << "\nWould you like to just watch two AI play against each other? (yes/no)";
+            cin >> ai_vs_ai_string;
+        }
+        
+        if(ai_vs_ai_string == "yes" || ai_vs_ai_string == "y")
+        {
+            cout << "The match will now begin between heuristic AI and pure Monte-Carlo Tree Search";
+            ai_vs_ai = true;
+        }
+        else if (ai_vs_ai_string == "no" || ai_vs_ai_string == "n")
+        {
+            cout << "The match will now begin between you and pure Monte-Carlo Tree Search";
+            ai_vs_ai = false;
+        }
+        else if(ai_vs_ai_string == "test")
+        {
+            ai_vs_ai = true;
+            int mct_count = 0;
+            int heuristic_count = 0;
+            for(int j=0;j<100;j++)
+            {
+                turn = 1;
+                std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
+                // this was added because the same number was being generated on every run
+                player = rand() % 2 + 1;
+                // if(player == 1) ai = 2;
+                // else ai = 1;
+                // print_intro();
+                init_boards();
+                clear_legal_moves();
+                find_legal_moves();
+                // print_boards();
+
+                while (!check_for_end())
+                {
+                    read_input();
+                    clear_legal_moves();
+                    find_legal_moves();
+                    // print_boards();
+                }
+
+                cout << "Fini\n\n";
+                int winner = check_winner();
+                
+                
+                if(winner == player) heuristic_count ++;
+                else mct_count ++;
+            }
+            cout << "\nMCTS had: "<<mct_count<< " wins\n";
+            cout << "Heuristic AI had: "<<heuristic_count<< " wins\n";
+        }
+
+        if(ai_vs_ai_string != "test")
+        {
+            turn = 1; // x always goes first
             std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
             // this was added because the same number was being generated on every run
             player = rand() % 2 + 1;
             // if(player == 1) ai = 2;
             // else ai = 1;
-            // print_intro();
+            print_intro();
             init_boards();
             clear_legal_moves();
             find_legal_moves();
-            // print_boards();
+            print_boards();
 
             while (!check_for_end())
             {
                 read_input();
                 clear_legal_moves();
                 find_legal_moves();
-                // print_boards();
+                print_boards();
             }
 
             cout << "Fini\n\n";
             int winner = check_winner();
             
+            if (winner == 1)
+                cout << "\nx is the winner\n\n";
+            if (winner == 2)
+                cout << "\nO is the winner\n\n";
+            if (winner == 0)
+                cout << "\nThe match ended in a draw\n\n";
             
-            if(winner == player) heuristic_count ++;
-            else mct_count ++;
+            if(winner == player) 
+            {
+                if(ai_vs_ai) cout <<"The heuristic AI won\n";
+                else cout <<"The player won\n";
+            }
+            
+            else if(winner != 0) cout <<"The MCTS won\n";
+
+            cout << "\nPlay again? (yes/no)";
+            cin >> play_again;
         }
-        cout << "\nMCTS had: "<<mct_count<< " wins\n";
-        cout << "Heuristic AI had: "<<heuristic_count<< " wins\n";
     }
     
-    turn = 1; // x always goes first
-    std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
-    // this was added because the same number was being generated on every run
-    player = rand() % 2 + 1;
-    // if(player == 1) ai = 2;
-    // else ai = 1;
-    print_intro();
-    init_boards();
-    clear_legal_moves();
-    find_legal_moves();
-    print_boards();
-
-    while (!check_for_end())
-    {
-        read_input();
-        clear_legal_moves();
-        find_legal_moves();
-        print_boards();
-    }
-
-    cout << "Fini\n\n";
-    int winner = check_winner();
-    
-    if (winner == 1)
-        cout << "\nx is the winner\n\n";
-    if (winner == 2)
-        cout << "\nO is the winner\n\n";
-    if (winner == 0)
-        cout << "\nThe match ended in a draw\n\n";
-    
-    if(winner == player) 
-    {
-        if(ai_vs_ai) cout <<"The heuristic AI won\n";
-        else cout <<"The player won\n";
-    }
-    
-    else if(winner != 0) cout <<"The MCTS won\n";
 }
