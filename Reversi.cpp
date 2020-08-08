@@ -596,7 +596,7 @@ void Reversi::main_loop()
             if(winner == player) heuristic_count ++;
             else mct_count ++;
         }
-        cout << "MCTS had: "<<mct_count<< " wins\n";
+        cout << "\nMCTS had: "<<mct_count<< " wins\n";
         cout << "Heuristic AI had: "<<heuristic_count<< " wins\n";
     }
     
