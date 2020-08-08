@@ -10,7 +10,7 @@ Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in)
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    playouts = 8534 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    playouts = 8400 * 1; // 5 is the number of seconds, 8534 is how many moves can be made in a second
     initial_turn = turn_passed_in;
 
     // temp variables
@@ -434,6 +434,175 @@ void Mct::print_boards()
     cout << "\n";
 }
 
+void Mct::make_first_move(int move)
+{
+
+    int opponent;
+    int temp;
+    bool piece_between;
+
+    if (turn == 1)
+        opponent = 2;
+    else
+        opponent = 1;
+
+    int i = move;
+
+    // top left
+    temp = i - 9;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp -= 9;
+    }
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
+    {
+
+        temp = i - 9;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp -= 9;
+        }
+    };
+
+    // top
+    temp = i - 8;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp -= 8;
+    }
+    if (board[temp] == turn && piece_between)
+    {
+
+        temp = i - 8;
+        while (temp < 64 && temp >= 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp -= 8;
+        }
+    };
+
+    // top right
+    temp = i - 7;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp -= 7;
+    }
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
+    {
+        temp = i - 7;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp -= 7;
+        }
+    };
+
+    // right
+    temp = i + 1;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp += 1;
+    }
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
+    {
+        temp = i + 1;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp += 1;
+        }
+    };
+
+    // bottom right
+    temp = i + 9;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp += 9;
+    }
+    if (board[temp] == turn && (temp) % 8 != 0 && piece_between)
+    {
+        temp = i + 9;
+        while (temp < 64 && temp >= 0 && (temp) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp += 9;
+        }
+    };
+
+    // bottom
+    temp = i + 8;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp += 8;
+    }
+    if (board[temp] == turn && piece_between)
+    {
+        temp = i + 8;
+        while (temp < 64 && temp >= 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp += 8;
+        }
+    };
+
+    // bottom left
+    temp = i + 7;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp += 7;
+    }
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
+    {
+        temp = i + 7;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp += 7;
+        }
+    };
+
+    // left
+    temp = i - 1;
+    piece_between = false;
+    while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+    {
+        piece_between = true;
+        temp -= 1;
+    }
+    if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
+    {
+        temp = i - 1;
+        while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
+        {
+            board[temp] = turn;
+            temp -= 1;
+        }
+    };
+
+    board[move] = turn;
+    if (turn == 1)
+        turn = 2;
+    else
+        turn = 1;
+
+
+}
+
 int Mct::playout(void)
 {
 
@@ -470,6 +639,7 @@ int Mct::playout(void)
                     legal_moves[k] = initial_legal_moves[k];
                 }
                 // int count = 0;
+                make_first_move(i);
                 while (!check_for_end())
                 {
                     // cout << "Making move ..." << count << "\n\n\n\n\n";
@@ -492,7 +662,7 @@ int Mct::playout(void)
             auto end = high_resolution_clock::now();
             auto duration = duration_cast<milliseconds>(end-start);
             long duration_seconds = duration.count();
-            cout << playouts << " playouts took " << duration_seconds << " milliseconds\n";
+            // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
 
         }
     }
@@ -511,6 +681,6 @@ int Mct::playout(void)
         }
     }
 
-    cout << "\nThe AI chose: " << input << "\n";
+    cout << "\nThe MCTS chose: " << input << "\n";
     return input;
 }

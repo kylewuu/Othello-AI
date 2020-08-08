@@ -3,7 +3,7 @@
 
 using namespace std;
 
-class Mct
+class MctHeuristic
 {
     int initial_turn;
     int playouts;
@@ -15,10 +15,8 @@ class Mct
     int *legal_moves;
     int turn;
 
-
-
 public:
-    Mct(int *, int *, int);
+    MctHeuristic(int *, int *, int);
     void make_move(void);
     int playout(void);
     bool check_for_end(void);

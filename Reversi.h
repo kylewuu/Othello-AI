@@ -9,9 +9,10 @@ class Reversi
     int turn;
     int *board; // 0 = blank, 1 = player 1, 2 = player 2. 1=x=black 2=o=white
     int *legal_moves; // 0 = not legal, 1 = legal
-    int player;
+    int player; // player is also the heuristic AI when enabled
     int ai;
     string input;
+    bool ai_vs_ai; 
 
 public:
     Reversi(void);
