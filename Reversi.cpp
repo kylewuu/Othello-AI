@@ -546,7 +546,7 @@ void Reversi::read_input()
 void Reversi::main_loop()
 {
     string ai_vs_ai_string;
-    while(ai_vs_ai_string != "yes" && ai_vs_ai_string != "no" &&ai_vs_ai_string != "y" && ai_vs_ai_string != "n")
+    while(ai_vs_ai_string != "yes" && ai_vs_ai_string != "no" &&ai_vs_ai_string != "y" && ai_vs_ai_string != "n" && ai_vs_ai_string != "test")
     {
         cout << "Would you like to just watch two AI play against each other? (yes/no)";
         cin >> ai_vs_ai_string;
@@ -562,9 +562,46 @@ void Reversi::main_loop()
         cout << "The match will now begin between you and pure Monte-Carlo Tree Search";
         ai_vs_ai = false;
     }
+    else if(ai_vs_ai_string == "test")
+    {
+        ai_vs_ai = true;
+        int mct_count = 0;
+        int heuristic_count = 0;
+        for(int j=0;j<100;j++)
+        {
+            turn = 1;
+            std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
+            // this was added because the same number was being generated on every run
+            player = rand() % 2 + 1;
+            // if(player == 1) ai = 2;
+            // else ai = 1;
+            // print_intro();
+            init_boards();
+            clear_legal_moves();
+            find_legal_moves();
+            // print_boards();
+
+            while (!check_for_end())
+            {
+                read_input();
+                clear_legal_moves();
+                find_legal_moves();
+                // print_boards();
+            }
+
+            cout << "Fini\n\n";
+            int winner = check_winner();
+            
+            
+            if(winner == player) heuristic_count ++;
+            else mct_count ++;
+        }
+        cout << "MCTS had: "<<mct_count<< " wins\n";
+        cout << "Heuristic AI had: "<<heuristic_count<< " wins\n";
+    }
     
-    turn = 1;
-    srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
+    turn = 1; // x always goes first
+    std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
     // this was added because the same number was being generated on every run
     player = rand() % 2 + 1;
     // if(player == 1) ai = 2;

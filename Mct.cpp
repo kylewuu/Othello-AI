@@ -10,7 +10,7 @@ Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in)
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    playouts = 8400 * 1; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    playouts = 8400 * 0.2; // 5 is the number of seconds, 8534 is how many moves can be made in a second
     initial_turn = turn_passed_in;
 
     // temp variables
