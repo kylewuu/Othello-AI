@@ -6,11 +6,12 @@
 using namespace std;
 using namespace std::chrono;
 
-MctHeuristic::MctHeuristic(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in)
+MctHeuristic::MctHeuristic(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in, int playouts_passed_in)
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    playouts = 8400 * 0.2; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    // playouts = 8400 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    playouts = playouts_passed_in;
     initial_turn = turn_passed_in;
 
     // temp variables
@@ -599,8 +600,6 @@ void MctHeuristic::make_first_move(int move)
         turn = 2;
     else
         turn = 1;
-
-
 }
 
 int MctHeuristic::playout(void)
@@ -614,53 +613,50 @@ int MctHeuristic::playout(void)
     int moves_count = 0;
     int dynamic_playouts = 0;
     float early_move_multiplier[64] = {
-        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5,
-        0.75,0.75,1.25,1.25,1.25,1.25,0.75,0.75,
-        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
-        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
-        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
-        1.25,1.25,1.25,1.25,1.25,1.25,1.25,1.25,
-        0.75,0.75,1.25,1.25,1.25,1.25,0.75,0.75,
-        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5
-    };
+        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5,
+        0.75, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 0.75,
+        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
+        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
+        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
+        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
+        0.75, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 0.75,
+        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5};
 
     float mid_move_multiplier[64] = {
-        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5,
-        0.75,0.75,1,1,1,1,0.75,0.75,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        0.75,0.75,1,1,1,1,0.75,0.75,
-        1.5,0.75,1.25,1.25,1.25,1.25,0.75,1.5
-    };
+        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5,
+        0.75, 0.75, 1, 1, 1, 1, 0.75, 0.75,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        0.75, 0.75, 1, 1, 1, 1, 0.75, 0.75,
+        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5};
 
     float late_move_multiplier[64] = {
-        1.5,1,1.25,1.25,1.25,1.25,1,1.5,
-        1,0.75,1,1,1,1,1,1,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        1.25,1,1,1,1,1,1,1.25,
-        1,1,1,1,1,1,1,1,
-        1.5,1,1.25,1.25,1.25,1.25,1,1.5
-    };
+        1.5, 1, 1.25, 1.25, 1.25, 1.25, 1, 1.5,
+        1, 1, 1, 1, 1, 1, 1, 1,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1.25, 1, 1, 1, 1, 1, 1, 1.25,
+        1, 1, 1, 1, 1, 1, 1, 1,
+        1.5, 1, 1.25, 1.25, 1.25, 1.25, 1, 1.5};
 
     for (int i = 0; i < 64; i++)
     {
         scores[i] = 0;
-        if(initial_legal_moves[i] == 1) moves_count += 1;
+        if (initial_legal_moves[i] == 1)
+            moves_count += 1;
     }
-
-    
 
     for (int i = 0; i < 64; i++)
     {
-        dynamic_playouts = playouts/moves_count;
+        dynamic_playouts = playouts / moves_count;
         if (initial_legal_moves[i] == 1)
         {
             auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
             for (int j = 0; j < dynamic_playouts; j++)
+            // for (int j = 0; j < playouts; j++)
             {
                 // resetting the board
                 turn = initial_turn;
@@ -673,10 +669,14 @@ int MctHeuristic::playout(void)
                 make_first_move(i);
 
                 // heuristics for checking how many moves the opponent now has
-                for(int k=0;k<64;k++)
+                for (int k = 0; k < 64; k++)
                 {
-                    if(legal_moves[k] == 1) scores[i] -= 3/dynamic_playouts;
+                    if (legal_moves[k] == 1)
+                        scores[i] -= (3 / dynamic_playouts);
                 }
+                // // also to detect if it reveals a corner
+                if (legal_moves[0] == 1 || legal_moves[7] == 1 || legal_moves[63] == 1 || legal_moves[56] == 1)
+                    scores[i] -= (20 / dynamic_playouts);
 
                 while (!check_for_end())
                 {
@@ -684,7 +684,6 @@ int MctHeuristic::playout(void)
                     make_move();
                     clear_legal_moves();
                     find_legal_moves();
-
                 }
 
                 int winner = check_winner();
@@ -698,29 +697,31 @@ int MctHeuristic::playout(void)
 
             // more heuristics to different spots in the board
             int pieces_count = 0;
-            for(int k=0;k<64;k++)
+            for (int k = 0; k < 64; k++)
             {
-                if(initial_board[k] != 0) pieces_count ++;
+                if (initial_board[k] != 0)
+                    pieces_count++;
             }
 
-            if(pieces_count <= 20) scores[i] *= early_move_multiplier[i];
-            else if(pieces_count <= 35) scores[i] *= mid_move_multiplier[i];
-            else if(pieces_count <= 64) scores[i] *= late_move_multiplier[i];
-            
+            if (pieces_count <= 15)
+                scores[i] *= early_move_multiplier[i];
+            else if (pieces_count <= 25)
+                scores[i] *= mid_move_multiplier[i];
+            else if (pieces_count <= 64)
+                scores[i] *= late_move_multiplier[i];
 
             auto end = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(end-start);
+            auto duration = duration_cast<milliseconds>(end - start);
             long duration_seconds = duration.count();
             // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
-
         }
     }
 
     int max = (playouts * loss) - 1 - 5;
     int input = 0;
-    for(int i=0;i<64;i++)
+    for (int i = 0; i < 64; i++)
     {
-        if(initial_legal_moves[i] == 1)
+        if (initial_legal_moves[i] == 1)
         {
             max = scores[i];
             input = i;

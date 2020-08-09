@@ -20,7 +20,7 @@ void Reversi::print_intro()
          << "x                         x\n"
          << "xxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n " << endl;
 
-    if(!ai_vs_ai)
+    if (!ai_vs_ai)
     {
         if (player == 1)
             cout << "You are \033[31mx\033[0m, you are going first\n\n";
@@ -30,11 +30,10 @@ void Reversi::print_intro()
     else
     {
         if (player == 1)
-            cout << "Heuristic AI is \033[31mx\033[0m, it is going first\n\n";
+            cout << "MCTS w/heuristics is \033[31mx\033[0m, it is going first\n\n";
         else if (player == 2)
-            cout << "Heuristic AI is \033[36mO\033[0m, it is going second\n\n";
+            cout << "MCTS w/heuristics is \033[36mO\033[0m, it is going second\n\n";
     }
-    
 }
 
 void Reversi::init_boards()
@@ -279,7 +278,6 @@ bool Reversi::check_for_end()
         }
     }
 
-
     cout << "No players can make anymore valid moves\n";
 
     return true;
@@ -495,7 +493,7 @@ void Reversi::read_input()
     // if player's turn
     if (turn == player)
     {
-        if(!ai_vs_ai)
+        if (!ai_vs_ai)
         {
             bool is_int_flag = false;
             bool is_valid_space_flag = false;
@@ -520,18 +518,17 @@ void Reversi::read_input()
         }
         else
         {
-            cout << "It is the heuristic AI's turn\n";
-            MctHeuristic ai{board, legal_moves, turn};
+            cout << "It is the MCTS w/heuristics's turn\n";
+            MctHeuristic ai{board, legal_moves, turn, init_playouts};
             int ai_input = ai.playout();
             make_move(std::to_string(ai_input));
         }
-        
     }
 
     else
     {
         cout << "It is the MCTS's turn\n";
-        Mct ai{board, legal_moves, turn};
+        Mct ai{board, legal_moves, turn, init_playouts};
         int ai_input = ai.playout();
         make_move(std::to_string(ai_input));
         // temp_make_random_move();
@@ -540,40 +537,65 @@ void Reversi::read_input()
 
 void Reversi::main_loop()
 {
+    string init_playouts_string = "zero";
+    while (!is_int(init_playouts_string))
+    {
+        cout << "\nBefore we begin, how many random playouts would you like the algorithms to do? (every 8200 playouts equals to about 1 second) ";
+        cin >> init_playouts_string;
+        if (is_int(init_playouts_string) && stoi(init_playouts_string) <= 0)
+            init_playouts_string = "zero";
+    }
+    init_playouts = stoi(init_playouts_string);
+
     string play_again = "yes";
-    while(play_again != "no" && play_again != "n")
+    while (play_again != "no" && play_again != "n")
     {
         string ai_vs_ai_string;
-        while(ai_vs_ai_string != "yes" && ai_vs_ai_string != "no" &&ai_vs_ai_string != "y" && ai_vs_ai_string != "n" && ai_vs_ai_string != "test")
+        while (ai_vs_ai_string != "a" && ai_vs_ai_string != "b" && ai_vs_ai_string != "c" && ai_vs_ai_string != "d")
         {
-            cout << "\nWould you like to just watch two AI play against each other? (yes/no)";
+            cout << "\nWhat would you like to do?";
+            cout << "\na) Play against the pure Monte-Carlo Tree Search";
+            cout << "\nb) Watch the pure MCTS play again the MCTS w/heuristics";
+            cout << "\nc) Run a set amount of tests for MCTS vs MCTS w/heuristics\n";
             cin >> ai_vs_ai_string;
         }
-        
-        if(ai_vs_ai_string == "yes" || ai_vs_ai_string == "y")
+
+        if (ai_vs_ai_string == "a")
         {
-            cout << "The match will now begin between heuristic AI and pure Monte-Carlo Tree Search";
-            ai_vs_ai = true;
-        }
-        else if (ai_vs_ai_string == "no" || ai_vs_ai_string == "n")
-        {
-            cout << "The match will now begin between you and pure Monte-Carlo Tree Search";
+            cout << "The match will now begin between you and pure Monte-Carlo Tree Search\n";
             ai_vs_ai = false;
         }
-        else if(ai_vs_ai_string == "test")
+        if (ai_vs_ai_string == "b")
         {
+            cout << "The match will now begin between MCTS and MCTS w/heuristics\n";
+            ai_vs_ai = true;
+        }
+        else if (ai_vs_ai_string == "c")
+        {
+
+            string init_tests_string = "zero";
+            while (!is_int(init_tests_string))
+            {
+                cout << "\nHow many tests would you like the to do? ";
+                cin >> init_tests_string;
+                if (is_int(init_tests_string) && stoi(init_tests_string) <= 0)
+                    init_tests_string = "zero";
+            }
+            int init_tests = stoi(init_tests_string);
+
             ai_vs_ai = true;
             int mct_count = 0;
             int heuristic_count = 0;
-            for(int j=0;j<100;j++)
+            int random_count = 0;
+            for (int j = 0; j < init_tests; j++)
             {
                 turn = 1;
                 std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
                 // this was added because the same number was being generated on every run
                 player = rand() % 2 + 1;
-                // if(player == 1) ai = 2;
-                // else ai = 1;
-                // print_intro();
+                // if (player == 1)
+                //     random_count++;
+
                 init_boards();
                 clear_legal_moves();
                 find_legal_moves();
@@ -589,18 +611,20 @@ void Reversi::main_loop()
 
                 cout << "Fini\n\n";
                 int winner = check_winner();
-                
-                
-                if(winner == player) heuristic_count ++;
-                else mct_count ++;
+
+                if (winner == player)
+                    heuristic_count++;
+                else
+                    mct_count++;
             }
-            cout << "\nMCTS had: "<<mct_count<< " wins\n";
-            cout << "Heuristic AI had: "<<heuristic_count<< " wins\n";
+            cout << "\nMCTS had: " << mct_count << " wins\n";
+            cout << "MCTS w/heuristics had: " << heuristic_count << " wins\n";
+            // cout << "How many times the heuristic went first: " << random_count << "\n";
         }
 
-        if(ai_vs_ai_string != "test")
+        if (ai_vs_ai_string != "c")
         {
-            turn = 1; // x always goes first
+            turn = 1;                             // x always goes first
             std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
             // this was added because the same number was being generated on every run
             player = rand() % 2 + 1;
@@ -622,25 +646,26 @@ void Reversi::main_loop()
 
             cout << "Fini\n\n";
             int winner = check_winner();
-            
+
             if (winner == 1)
                 cout << "\nx is the winner\n\n";
             if (winner == 2)
                 cout << "\nO is the winner\n\n";
             if (winner == 0)
                 cout << "\nThe match ended in a draw\n\n";
-            
-            if(winner == player) 
-            {
-                if(ai_vs_ai) cout <<"The heuristic AI won\n";
-                else cout <<"The player won\n";
-            }
-            
-            else if(winner != 0) cout <<"The MCTS won\n";
 
-            cout << "\nPlay again? (yes/no)";
-            cin >> play_again;
+            if (winner == player)
+            {
+                if (ai_vs_ai)
+                    cout << "The MCTS w/heuristics won\n";
+                else
+                    cout << "The player won\n";
+            }
+
+            else if (winner != 0)
+                cout << "The MCTS won\n";
         }
+        cout << "\nPlay again? (yes/no)";
+        cin >> play_again;
     }
-    
 }

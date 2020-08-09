@@ -16,7 +16,7 @@ class MctHeuristic
     int turn;
 
 public:
-    MctHeuristic(int *, int *, int);
+    MctHeuristic(int *, int *, int, int);
     void make_move(void);
     int playout(void);
     bool check_for_end(void);

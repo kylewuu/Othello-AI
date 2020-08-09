@@ -6,11 +6,12 @@
 using namespace std;
 using namespace std::chrono;
 
-Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in)
+Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in, int playouts_passed_in)
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    playouts = 8400 * 0.2; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    // playouts = 8400 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
+    playouts = playouts_passed_in;
     initial_turn = turn_passed_in;
 
     // temp variables
@@ -599,8 +600,6 @@ void Mct::make_first_move(int move)
         turn = 2;
     else
         turn = 1;
-
-
 }
 
 int Mct::playout(void)
@@ -617,18 +616,18 @@ int Mct::playout(void)
     for (int i = 0; i < 64; i++)
     {
         scores[i] = 0;
-        if(initial_legal_moves[i] == 1) moves_count += 1;
+        if (initial_legal_moves[i] == 1)
+            moves_count += 1;
     }
-
-    
 
     for (int i = 0; i < 64; i++)
     {
-        dynamic_playouts = playouts/moves_count;
+        dynamic_playouts = playouts / moves_count;
         if (initial_legal_moves[i] == 1)
         {
             auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
             for (int j = 0; j < dynamic_playouts; j++)
+            // for (int j = 0; j < playouts; j++)
             {
                 // resetting the board
 
@@ -660,10 +659,9 @@ int Mct::playout(void)
             }
 
             auto end = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(end-start);
+            auto duration = duration_cast<milliseconds>(end - start);
             long duration_seconds = duration.count();
             // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
-
         }
     }
 
