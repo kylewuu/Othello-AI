@@ -620,12 +620,12 @@ int Mct::playout(void)
             moves_count += 1;
     }
 
+    auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
     for (int i = 0; i < 64; i++)
     {
         dynamic_playouts = playouts / moves_count;
         if (initial_legal_moves[i] == 1)
         {
-            auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
             for (int j = 0; j < dynamic_playouts; j++)
             // for (int j = 0; j < playouts; j++)
             {
@@ -657,13 +657,12 @@ int Mct::playout(void)
                 if (winner == 0)
                     scores[i] += draw;
             }
-
-            auto end = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(end - start);
-            long duration_seconds = duration.count();
-            // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
         }
     }
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    long duration_seconds = duration.count();
+    cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
 
     int max = (playouts * loss) - 1;
     int input = 0;

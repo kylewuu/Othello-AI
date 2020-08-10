@@ -613,34 +613,34 @@ int MctHeuristic::playout(void)
     int moves_count = 0;
     int dynamic_playouts = 0;
     float early_move_multiplier[64] = {
-        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5,
+        1.50, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.50,
         0.75, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 0.75,
-        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
-        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
-        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
-        1.25, 1.25, 1.5, 1.5, 1.5, 1.5, 1.25, 1.25,
+        1.25, 1.25, 1.50, 1.50, 1.50, 1.50, 1.25, 1.25,
+        1.25, 1.25, 1.50, 1.50, 1.50, 1.50, 1.25, 1.25,
+        1.25, 1.25, 1.50, 1.50, 1.50, 1.50, 1.25, 1.25,
+        1.25, 1.25, 1.50, 1.50, 1.50, 1.50, 1.25, 1.25,
         0.75, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 0.75,
-        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5};
+        1.50, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.50};
 
     float mid_move_multiplier[64] = {
-        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5,
-        0.75, 0.75, 1, 1, 1, 1, 0.75, 0.75,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        0.75, 0.75, 1, 1, 1, 1, 0.75, 0.75,
-        1.5, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.5};
+        1.50, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.50,
+        0.75, 0.75, 1.00, 1.00, 1.00, 1.00, 0.75, 0.75,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        0.75, 0.75, 1.00, 1.00, 1.00, 1.00, 0.75, 0.75,
+        1.50, 0.75, 1.25, 1.25, 1.25, 1.25, 0.75, 1.50};
 
     float late_move_multiplier[64] = {
-        1.5, 1, 1.25, 1.25, 1.25, 1.25, 1, 1.5,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1.25, 1, 1, 1, 1, 1, 1, 1.25,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1.5, 1, 1.25, 1.25, 1.25, 1.25, 1, 1.5};
+        1.50, 1.00, 1.25, 1.25, 1.25, 1.25, 1.00, 1.50,
+        1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.25, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.25,
+        1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+        1.50, 1.00, 1.25, 1.25, 1.25, 1.25, 1.00, 1.50};
 
     for (int i = 0; i < 64; i++)
     {
@@ -649,12 +649,14 @@ int MctHeuristic::playout(void)
             moves_count += 1;
     }
 
+    // auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
     for (int i = 0; i < 64; i++)
     {
         dynamic_playouts = playouts / moves_count;
+        if (dynamic_playouts < 1)
+            dynamic_playouts = 1;
         if (initial_legal_moves[i] == 1)
         {
-            auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
             for (int j = 0; j < dynamic_playouts; j++)
             // for (int j = 0; j < playouts; j++)
             {
@@ -705,17 +707,16 @@ int MctHeuristic::playout(void)
 
             if (pieces_count <= 15)
                 scores[i] *= early_move_multiplier[i];
-            else if (pieces_count <= 25)
+            else if (pieces_count <= 35)
                 scores[i] *= mid_move_multiplier[i];
             else if (pieces_count <= 64)
                 scores[i] *= late_move_multiplier[i];
-
-            auto end = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(end - start);
-            long duration_seconds = duration.count();
-            // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
         }
     }
+    // auto end = high_resolution_clock::now();
+    // auto duration = duration_cast<milliseconds>(end - start);
+    // long duration_seconds = duration.count();
+    // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
 
     int max = (playouts * loss) - 1 - 5;
     int input = 0;

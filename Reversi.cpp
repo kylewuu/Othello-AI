@@ -541,7 +541,7 @@ void Reversi::main_loop()
     string set_playouts = " ";
     while (set_playouts != "yes" && set_playouts != "y" && set_playouts != "no" && set_playouts != "n")
     {
-        cout << "Would you like to set your own playouts? It is set to 10000 right now. Every 8200 playouts equals to about 1 second \n(yes/no) ";
+        cout << "Would you like to set your own playouts? It is set to 10000 right now. Every 12,042 playouts equals to about 1 second \n(yes/no) ";
         cin >> set_playouts;
     }
     if (set_playouts == "yes" || set_playouts == "y")
@@ -549,7 +549,7 @@ void Reversi::main_loop()
         string init_playouts_string = "zero";
         while (!is_int(init_playouts_string))
         {
-            cout << "\nBefore we begin, how many random playouts would you like the algorithms to do?\n(every 8200 playouts equals to about 1 second)\n(Enter 10000 if you do not know what number to choose) ";
+            cout << "\nBefore we begin, how many random playouts would you like the algorithms to do?\n(every 12,042 playouts equals to about 1 second)\n(Enter 10000 if you do not know what number to choose) ";
             cin >> init_playouts_string;
             if (is_int(init_playouts_string) && stoi(init_playouts_string) <= 0)
                 init_playouts_string = "zero";
@@ -629,6 +629,7 @@ void Reversi::main_loop()
             }
             cout << "\nMCTS had: " << mct_count << " wins\n";
             cout << "MCTS w/heuristics had: " << heuristic_count << " wins\n";
+            cout << "These were tested at " << init_playouts << " playouts\n";
             // cout << "How many times the heuristic went first: " << random_count << "\n";
         }
 
