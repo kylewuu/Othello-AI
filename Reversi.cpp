@@ -8,7 +8,6 @@ using namespace std;
 
 Reversi::Reversi(void)
 {
-
     main_loop();
 };
 
@@ -75,21 +74,9 @@ void Reversi::print_boards()
         }
         cout << "          ";
 
-        // map board
-        // for (int j = 0; j < 8; j++)
-        // {
-
-        //     cout << (legal_moves[(i * 8) + j] == 1 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " ") : "    ") << ((j == 7) ? " " : " | ");
-        // }
-
         // player board
         if (i != 7)
             cout << "\n-------------------------------------------------------";
-
-        // map board
-        // cout << "         ";
-        // if (i != 7)
-        //     cout << "-------------------------------------------------------";
 
         cout << "\n";
     }
@@ -137,7 +124,6 @@ void Reversi::find_legal_moves()
 
     for (int i = 0; i < 64; i++)
     {
-        // cout << board[i];
         if (board[i] == turn)
         {
             // top left
@@ -233,7 +219,6 @@ void Reversi::find_legal_moves()
 
 bool Reversi::check_for_end()
 {
-
     bool legal_moves_flag = false;
     for (int i = 0; i < 64; i++)
     {
@@ -248,7 +233,6 @@ bool Reversi::check_for_end()
     {
         if (turn == 1)
         {
-
             turn = 2;
             find_legal_moves();
             for (int i = 0; i < 64; i++)
@@ -263,7 +247,6 @@ bool Reversi::check_for_end()
         }
         else
         {
-
             turn = 1;
             find_legal_moves();
             for (int i = 0; i < 64; i++)
@@ -279,7 +262,6 @@ bool Reversi::check_for_end()
     }
 
     cout << "No players can make anymore valid moves\n";
-
     return true;
 }
 
@@ -305,7 +287,7 @@ int Reversi::check_winner()
     return 0;
 }
 
-void Reversi::make_move(string str) // need to add the flipping
+void Reversi::make_move(string str)
 {
     int int_input = stoi(str);
 
@@ -330,7 +312,6 @@ void Reversi::make_move(string str) // need to add the flipping
     }
     if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
     {
-
         temp = i - 9;
         while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
         {
@@ -349,7 +330,6 @@ void Reversi::make_move(string str) // need to add the flipping
     }
     if (board[temp] == turn && piece_between)
     {
-
         temp = i - 8;
         while (temp < 64 && temp >= 0 && board[temp] == opponent)
         {
@@ -475,16 +455,12 @@ void Reversi::make_move(string str) // need to add the flipping
 
 void Reversi::temp_make_random_move()
 {
-
     int move = rand() % 64;
-    ;
     while (legal_moves[move] == 0)
     {
         move = rand() % 64;
     }
-
     cout << "The AI chose: " << move << "\n";
-
     make_move(std::to_string(move));
 }
 
@@ -600,23 +576,18 @@ void Reversi::main_loop()
             for (int j = 0; j < init_tests; j++)
             {
                 turn = 1;
-                std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
-                // this was added because the same number was being generated on every run
+                std::srand((unsigned int)time(NULL));
                 player = rand() % 2 + 1;
-                // if (player == 1)
-                //     random_count++;
 
                 init_boards();
                 clear_legal_moves();
                 find_legal_moves();
-                // print_boards();
 
                 while (!check_for_end())
                 {
                     read_input();
                     clear_legal_moves();
                     find_legal_moves();
-                    // print_boards();
                 }
 
                 cout << "Fini\n\n";
@@ -630,17 +601,13 @@ void Reversi::main_loop()
             cout << "\nMCTS had: " << mct_count << " wins\n";
             cout << "MCTS w/heuristics had: " << heuristic_count << " wins\n";
             cout << "These were tested at " << init_playouts << " playouts\n";
-            // cout << "How many times the heuristic went first: " << random_count << "\n";
         }
 
         if (ai_vs_ai_string != "c")
         {
-            turn = 1;                             // x always goes first
-            std::srand((unsigned int)time(NULL)); // https://stackoverflow.com/questions/9459035/why-does-rand-yield-the-same-sequence-of-numbers-on-every-run
-            // this was added because the same number was being generated on every run
+            turn = 1; // x always goes first
+            std::srand((unsigned int)time(NULL));
             player = rand() % 2 + 1;
-            // if(player == 1) ai = 2;
-            // else ai = 1;
             print_intro();
             init_boards();
             clear_legal_moves();

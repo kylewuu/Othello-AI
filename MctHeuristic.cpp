@@ -10,11 +10,9 @@ MctHeuristic::MctHeuristic(int *board_passed_in, int *legal_moves_passed_in, int
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    // playouts = 8400 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
     playouts = playouts_passed_in;
     initial_turn = turn_passed_in;
 
-    // temp variables
     turn = initial_turn;
     legal_moves = new int[64];
     board = new int[64];
@@ -24,13 +22,6 @@ MctHeuristic::MctHeuristic(int *board_passed_in, int *legal_moves_passed_in, int
         initial_board[i] = board_passed_in[i];
         initial_legal_moves[i] = legal_moves_passed_in[i];
     }
-    // for (int i = 0; i < 64; i++)
-    // {
-    //     if (i % 8 == 0)
-    //         cout << "\n";
-    //     cout << initial_legal_moves[i] << " ";
-    // }
-    // cout << "\n\n";
 };
 
 void MctHeuristic::make_move(void)
@@ -324,7 +315,6 @@ void MctHeuristic::find_legal_moves()
 
 bool MctHeuristic::check_for_end(void)
 {
-
     bool legal_moves_flag = false;
     for (int i = 0; i < 64; i++)
     {
@@ -345,10 +335,7 @@ bool MctHeuristic::check_for_end(void)
             for (int i = 0; i < 64; i++)
             {
                 if (legal_moves[i] == 1)
-                {
-                    // cout << "\033[31mx\033[0m has no moves, \033[36mO\033[0m is going now.";
                     return false;
-                }
             }
         }
         else
@@ -359,19 +346,8 @@ bool MctHeuristic::check_for_end(void)
             for (int i = 0; i < 64; i++)
             {
                 if (legal_moves[i] == 1)
-                {
-                    // cout << "\033[36mO\033[0m has no moves, \033[31mx\033[0m is going now.";
                     return false;
-                }
             }
-        }
-    }
-
-    for (int i = 0; i < 64; i++)
-    {
-        if (board[i] == 0)
-        {
-            // cout << "No players can make anymore valid moves\n";
         }
     }
 
@@ -391,8 +367,6 @@ int MctHeuristic::check_winner()
             o += 1;
     }
 
-    // cout << "\nx: " << x;
-    // cout << "\nO: " << o;
     if (x > o)
         return 1;
     else if (o > x)
@@ -404,7 +378,6 @@ void MctHeuristic::print_boards()
 {
     for (int i = 0; i < 8; i++)
     {
-
         // player board
         cout << " ";
         for (int j = 0; j < 8; j++)
@@ -414,21 +387,9 @@ void MctHeuristic::print_boards()
         }
         cout << "          ";
 
-        // map board
-        // for (int j = 0; j < 8; j++)
-        // {
-
-        //     cout << (legal_moves[(i * 8) + j] == 1 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " ") : "    ") << ((j == 7) ? " " : " | ");
-        // }
-
         // player board
         if (i != 7)
             cout << "\n-------------------------------------------------------";
-
-        // map board
-        // cout << "         ";
-        // if (i != 7)
-        //     cout << "-------------------------------------------------------";
 
         cout << "\n";
     }
@@ -459,7 +420,6 @@ void MctHeuristic::make_first_move(int move)
     }
     if (board[temp] == turn && (temp + 1) % 8 != 0 && piece_between)
     {
-
         temp = i - 9;
         while (temp < 64 && temp >= 0 && (temp + 1) % 8 != 0 && board[temp] == opponent)
         {
@@ -604,7 +564,6 @@ void MctHeuristic::make_first_move(int move)
 
 int MctHeuristic::playout(void)
 {
-
     float *scores = new float[64];
 
     int loss = -50;
@@ -649,7 +608,6 @@ int MctHeuristic::playout(void)
             moves_count += 1;
     }
 
-    // auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
     for (int i = 0; i < 64; i++)
     {
         dynamic_playouts = playouts / moves_count;
@@ -658,7 +616,6 @@ int MctHeuristic::playout(void)
         if (initial_legal_moves[i] == 1)
         {
             for (int j = 0; j < dynamic_playouts; j++)
-            // for (int j = 0; j < playouts; j++)
             {
                 // resetting the board
                 turn = initial_turn;
@@ -667,7 +624,6 @@ int MctHeuristic::playout(void)
                     board[k] = initial_board[k];
                     legal_moves[k] = initial_legal_moves[k];
                 }
-                // int count = 0;
                 make_first_move(i);
 
                 // heuristics for checking how many moves the opponent now has
@@ -676,7 +632,7 @@ int MctHeuristic::playout(void)
                     if (legal_moves[k] == 1)
                         scores[i] -= (3 / dynamic_playouts);
                 }
-                // // also to detect if it reveals a corner
+                // also to detect if it reveals a corner
                 if (legal_moves[0] == 1 || legal_moves[7] == 1 || legal_moves[63] == 1 || legal_moves[56] == 1)
                     scores[i] -= (20 / dynamic_playouts);
 
@@ -713,10 +669,6 @@ int MctHeuristic::playout(void)
                 scores[i] *= late_move_multiplier[i];
         }
     }
-    // auto end = high_resolution_clock::now();
-    // auto duration = duration_cast<milliseconds>(end - start);
-    // long duration_seconds = duration.count();
-    // cout << dynamic_playouts << " playouts took " << duration_seconds << " milliseconds\n";
 
     int max = (playouts * loss) - 1 - 5;
     int input = 0;
@@ -730,9 +682,6 @@ int MctHeuristic::playout(void)
     }
     for (int i = 0; i < 64; i++)
     {
-        // if (i % 8 == 0)
-        //     cout << "\n";
-        // cout << scores[i] << " ";
         if (initial_legal_moves[i] == 1 && scores[i] > max)
         {
             max = scores[i];

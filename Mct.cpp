@@ -10,7 +10,6 @@ Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in, i
 {
     initial_board = new int[64];
     initial_legal_moves = new int[64];
-    // playouts = 8400 * 5; // 5 is the number of seconds, 8534 is how many moves can be made in a second
     playouts = playouts_passed_in;
     initial_turn = turn_passed_in;
 
@@ -24,13 +23,6 @@ Mct::Mct(int *board_passed_in, int *legal_moves_passed_in, int turn_passed_in, i
         initial_board[i] = board_passed_in[i];
         initial_legal_moves[i] = legal_moves_passed_in[i];
     }
-    // for (int i = 0; i < 64; i++)
-    // {
-    //     if (i % 8 == 0)
-    //         cout << "\n";
-    //     cout << initial_legal_moves[i] << " ";
-    // }
-    // cout << "\n\n";
 };
 
 void Mct::make_move(void)
@@ -228,7 +220,6 @@ void Mct::find_legal_moves()
 
     for (int i = 0; i < 64; i++)
     {
-        // cout << board[i];
         if (board[i] == turn)
         {
             // top left
@@ -324,7 +315,6 @@ void Mct::find_legal_moves()
 
 bool Mct::check_for_end(void)
 {
-
     bool legal_moves_flag = false;
     for (int i = 0; i < 64; i++)
     {
@@ -345,10 +335,7 @@ bool Mct::check_for_end(void)
             for (int i = 0; i < 64; i++)
             {
                 if (legal_moves[i] == 1)
-                {
-                    // cout << "\033[31mx\033[0m has no moves, \033[36mO\033[0m is going now.";
                     return false;
-                }
             }
         }
         else
@@ -359,19 +346,8 @@ bool Mct::check_for_end(void)
             for (int i = 0; i < 64; i++)
             {
                 if (legal_moves[i] == 1)
-                {
-                    // cout << "\033[36mO\033[0m has no moves, \033[31mx\033[0m is going now.";
                     return false;
-                }
             }
-        }
-    }
-
-    for (int i = 0; i < 64; i++)
-    {
-        if (board[i] == 0)
-        {
-            // cout << "No players can make anymore valid moves\n";
         }
     }
 
@@ -391,8 +367,6 @@ int Mct::check_winner()
             o += 1;
     }
 
-    // cout << "\nx: " << x;
-    // cout << "\nO: " << o;
     if (x > o)
         return 1;
     else if (o > x)
@@ -404,7 +378,6 @@ void Mct::print_boards()
 {
     for (int i = 0; i < 8; i++)
     {
-
         // player board
         cout << " ";
         for (int j = 0; j < 8; j++)
@@ -414,21 +387,9 @@ void Mct::print_boards()
         }
         cout << "          ";
 
-        // map board
-        // for (int j = 0; j < 8; j++)
-        // {
-
-        //     cout << (legal_moves[(i * 8) + j] == 1 ? (((i * 8) + j > 9 ? " " : "  ") + std::to_string((i * 8) + j) + " ") : "    ") << ((j == 7) ? " " : " | ");
-        // }
-
         // player board
         if (i != 7)
             cout << "\n-------------------------------------------------------";
-
-        // map board
-        // cout << "         ";
-        // if (i != 7)
-        //     cout << "-------------------------------------------------------";
 
         cout << "\n";
     }
@@ -437,7 +398,6 @@ void Mct::print_boards()
 
 void Mct::make_first_move(int move)
 {
-
     int opponent;
     int temp;
     bool piece_between;
@@ -604,7 +564,6 @@ void Mct::make_first_move(int move)
 
 int Mct::playout(void)
 {
-
     int *scores = new int[64];
 
     int loss = -50;
@@ -620,17 +579,14 @@ int Mct::playout(void)
             moves_count += 1;
     }
 
-    auto start = high_resolution_clock::now(); // https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
+    auto start = high_resolution_clock::now();
     for (int i = 0; i < 64; i++)
     {
         dynamic_playouts = playouts / moves_count;
         if (initial_legal_moves[i] == 1)
         {
             for (int j = 0; j < dynamic_playouts; j++)
-            // for (int j = 0; j < playouts; j++)
             {
-                // resetting the board
-
                 turn = initial_turn;
                 for (int k = 0; k < 64; k++)
                 {
@@ -641,12 +597,9 @@ int Mct::playout(void)
                 make_first_move(i);
                 while (!check_for_end())
                 {
-                    // cout << "Making move ..." << count << "\n\n\n\n\n";
-                    // count++;
                     make_move();
                     clear_legal_moves();
                     find_legal_moves();
-                    // print_boards();
                 }
 
                 int winner = check_winner();
@@ -668,9 +621,6 @@ int Mct::playout(void)
     int input = 0;
     for (int i = 0; i < 64; i++)
     {
-        // if (i % 8 == 0)
-        //     cout << "\n";
-        // cout << scores[i] << " ";
         if (initial_legal_moves[i] == 1 && scores[i] > max)
         {
             max = scores[i];
