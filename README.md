@@ -11,7 +11,6 @@ The X acts as the black piece in Reversi and always moves first.
 The O acts as the white piece in Reversi and always moves second.
 The yellow numbers are the legal moves given the current board.
 
-
 ## Getting Started:
 download and cd into the folder
 
